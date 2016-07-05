@@ -1,0 +1,10 @@
+[package]
+name = "nixpkgs-installer"
+version = "0.1.0"
+authors = ["Maarten Hoogendoorn <maarten@moretea.nl>"]
+
+[dependencies]
+elf = "0.0.9"
+bzip2 = "0.3"
+tar = "0.4"
+tempdir="0.3"
