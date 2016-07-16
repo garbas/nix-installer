@@ -1,19 +1,47 @@
-{ pkgs ? import <nixpkgs> {}
-}:
-
+{ pkgs ? import <nixpkgs> {} }:
 let
-in buildRustPackage rec {
-    inherit src;
-    name = "servo-rust-${version}";
-    postUnpack = ''
-      pwd
-      ls -la 
-      exit 100
-    '';
-    sourceRoot = "servo/components/servo";
+  rustPlatform = pkgs.recurseIntoAttrs (pkgs.makeRustPlatform pkgs.rustStable rustPlatform);
+  version = "master";
 
-    depsSha256 = "0ca0lc8mm8kczll5m03n5fwsr0540c2xbfi4nn9ksn0s4sap50yn";
-
+  installer = rustPlatform.buildRustPackage {
+    name = "nix-installer-${version}";
+    src = ./installer;
+    depsSha256 = "1mph1rdnjq8dhrf3slvkb3mvv161gmyqaz0nlrn81idi9n5r2czl";
     doCheck = false;
   };
 
+  tarball = pkgs.fetchurl {
+   url = https://nixos.org/releases/nix/nix-1.11.2/nix-1.11.2-x86_64-linux.tar.bz2;
+   sha256 = "0jbx85i6b0x7nc2q31g9iywj12b1fx84ivig3792pnlnsgy8q84b";
+  };
+
+  installerWithTarball = pkgs.stdenv.mkDerivation {
+    name = "nix-instaler-with-tarball-${version}";
+    phases = "composePhase";
+
+    composePhase = ''
+       mkdir -p $out/bin
+       objcopy --add-section .nixdata=${tarball} \
+         --set-section-flags .nixdata=noload,readonly ${installer}/bin/nixpkgs-installer $out/bin/nixpkgs-installer
+     '';
+  };
+
+  # TODO: is broken because of failing to read on /dev/random.
+  # TODO: add more distributions + osx test (using a chroot?)
+  tests.ubuntu1204x86_64 =
+    with pkgs;
+    let
+      img = runCommand "nix-binary-tarball-test" {
+        diskImage = vmTools.diskImages.ubuntu1204x86_64;
+        QEMU_OPTS = "-device virtio-rng-pci";
+      } script;
+      script = ''
+        ${pkgs.strace}/bin/strace ${installerWithTarball}/bin/nixpkgs-installer --help
+      '';
+    in
+      vmTools.runInLinuxImage img;
+  jobs = {
+    inherit installer;
+    inherit tests;
+  };
+in jobs
