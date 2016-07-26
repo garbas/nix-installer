@@ -22,15 +22,6 @@ struct InstallOptions {
     prefix: Option<PathBuf>
 }
 
-//impl std::fmt::Display for InstallOptions {
-//    fn fmt(&self, x: &mut std::fmt::Formatter) -> Result<(),std::fmt::Error> {
-//        try!(write!(x, "hi there, tarball: {:?}, prefix: {:?}", self.tarball, self.prefix));
-//        try!(write!(x, "hi there, tarball: {:?}, prefix: {:?}", self.tarball, self.prefix));
-//
-//        Ok(())
-//    }
-//}
-
 fn main() {
   let matches = App::new("Nix installer")
                   .version("0.1.0")
@@ -56,14 +47,9 @@ fn main() {
       prefix: matches.value_of("prefix").map(|v| PathBuf::from(v) )
   };
 
-//  println!("{:?}", install_options);
-
 // let install_options = dialog(install_option)
 
   install_nix(install_options);
-
-//  let nix_prefix = matches.value_of("nix-prefix").unwrap_or("/nix");
-//  let nix_store = format!("{}/store", nix_prefix)
 }
 
 fn install_nix(options: InstallOptions) {
@@ -80,6 +66,7 @@ fn install_nix(options: InstallOptions) {
     std::process::exit(status.code().unwrap());
 }
 
+/// Extracts the installer archive, based on the options provided.
 fn extract_archive(options: &InstallOptions) -> TempDir {
     fn do_extract_archive(decoder: BzDecoder<&[u8]>) -> TempDir {
         println!("Extracting archive");
