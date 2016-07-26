@@ -26,7 +26,6 @@ let
      '';
   };
 
-  # TODO: is broken because of failing to read on /dev/random.
   # TODO: add more distributions + osx test (using a chroot?)
   tests.ubuntu1204x86_64 =
     with pkgs;
@@ -36,10 +35,15 @@ let
         QEMU_OPTS = "-device virtio-rng-pci";
       } script;
       script = ''
-        ${pkgs.strace}/bin/strace ${installerWithTarball}/bin/nixpkgs-installer --help
+        ${coreutils}/bin/mknod /dev/hwrng c 10 183
+        ${rng_tools}/bin/rngd
+        ${installerWithTarball}/bin/nixpkgs-installer --help
       '';
+      runCustomInImage = vmTools.override {
+        rootModules = [ "virtio_rng" "virtio_pci" "virtio_blk" "virtio_balloon" "ext4" "unix" "9p" "9pnet_virtio" "rtc_cmos" ];
+      };
     in
-      vmTools.runInLinuxImage img;
+      runCustomInImage.runInLinuxImage img;
   jobs = {
     inherit installer;
     inherit tests;
