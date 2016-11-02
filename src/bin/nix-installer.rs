@@ -66,7 +66,7 @@ fn install_nix(options: InstallOptions) {
     std::process::exit(status.code().unwrap());
 }
 
-/// Extracts the installer archive, based on the options provided.
+// Extracts the installer archive, based on the options provided.
 fn extract_archive(options: &InstallOptions) -> TempDir {
     fn do_extract_archive(decoder: BzDecoder<&[u8]>) -> TempDir {
         println!("Extracting archive");

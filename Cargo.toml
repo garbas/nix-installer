@@ -1,5 +1,5 @@
 [package]
-name = "nixpkgs-installer"
+name = "nix-installer"
 version = "0.1.0"
 authors = ["Maarten Hoogendoorn <maarten@moretea.nl>"]
 
@@ -7,5 +7,5 @@ authors = ["Maarten Hoogendoorn <maarten@moretea.nl>"]
 elf = "0.0.9"
 bzip2 = "0.3"
 tar = "0.4.5"
-tempdir="0.3"
+tempdir = "0.3"
 clap = "2.5"

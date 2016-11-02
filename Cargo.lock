@@ -1,5 +1,5 @@
 [root]
-name = "nixpkgs-installer"
+name = "nix-installer"
 version = "0.1.0"
 dependencies = [
  "bzip2 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
