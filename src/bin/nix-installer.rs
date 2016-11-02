@@ -53,7 +53,6 @@ fn main() {
 }
 
 fn install_nix(options: InstallOptions) {
-    println!("Extracting archive");
     let temp_dir = extract_archive(&options);
 
     let mut installer_dir = temp_dir.path().to_path_buf();
