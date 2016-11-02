@@ -17,7 +17,7 @@ let
     composePhase = ''
        mkdir -p $out/bin
        objcopy --add-section .nixdata=${tarball} \
-         --set-section-flags .nixdata=noload,readonly ${installer}/bin/nixpkgs-installer $out/bin/nixpkgs-installer
+         --set-section-flags .nixdata=noload,readonly ${installer}/bin/nix-installer $out/bin/nix-installer
      '';
   };
 
