@@ -16,7 +16,8 @@ let
 
     composePhase = ''
        mkdir -p $out/bin
-       objcopy --add-section .nixdata=${tarball} \
+       objcopy \
+         --add-section .nixdata=${tarball} \
          --set-section-flags .nixdata=noload,readonly ${installer}/bin/nix-installer $out/bin/nix-installer
      '';
   };
@@ -26,22 +27,15 @@ let
     ubuntu1204x86_64 =
       let
         img = pkgs.runCommand "nix-binary-tarball-test" {
+          memSize = 1024;
           diskImage = pkgs.vmTools.diskImages.ubuntu1204x86_64;
-          QEMU_OPTS = "-device virtio-rng-pci";
         } script;
         script = ''
-          ${pkgs.coreutils}/bin/mknod /dev/hwrng c 10 183
-          ${pkgs.rng_tools}/bin/rngd
           ${installerWithTarball}/bin/nix-installer --help
+          ${installerWithTarball}/bin/nix-installer 
         '';
-        runCustomInImage = pkgs.vmTools.override {
-          rootModules = [
-            "virtio_rng" "virtio_pci" "virtio_blk" "virtio_balloon" "ext4"
-            "unix" "9p" "9pnet_virtio" "rtc_cmos"
-          ];
-        };
       in
-        runCustomInImage.runInLinuxImage img;
+        pkgs.vmTools.runInLinuxImage img;
   };
 
   jobs = {
