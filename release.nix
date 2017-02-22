@@ -20,7 +20,7 @@ in
 let
 
   version = "0.1.0";  # TODO: read this from Cargo.toml
-  installer = import ./default.nix { inherit pkgs version; };
+  installer = import ./default.nix { inherit pkgs; };
 
   installerWithTarball = pkgs.stdenv.mkDerivation {
     name = "nix-instaler-with-tarball-${version}";
