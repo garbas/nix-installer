@@ -1,7 +1,19 @@
+let
+  _pkgs = import <nixpkgs> {};
+  # run the following command to generate rev and sha256
+  #   nix-prefetch-git https://github.com/NixOS/nixpkgs-channels > nixpkgs.json
+  _nixpkgs_json = _pkgs.lib.importJSON ./nixpkgs.json;
+  _nixpkgs = {
+    owner = "NixOS";
+    repo = "nixpkgs-channels";
+    rev = _nixpkgs_json.rev;
+    sha256 = _nixpkgs_json.sha256;
+  };
+in
 { pkgs ? import <nixpkgs> {}
 , tarball ? pkgs.fetchurl {
-   url = https://nixos.org/releases/nix/nix-1.11.2/nix-1.11.2-x86_64-linux.tar.bz2;
-   sha256 = "0jbx85i6b0x7nc2q31g9iywj12b1fx84ivig3792pnlnsgy8q84b";
+   url = "https://nixos.org/releases/nix/nix-1.11.6/nix-1.11.6-x86_64-linux.tar.bz2";
+   sha256 = "0s8rkb8qbgjh3pc4v1m3na766ddx4s6778nw8hwicf8d5jgv0gnk";
   }
 }:
 
@@ -39,8 +51,10 @@ let
   };
 
   jobs = {
-    inherit installer;
-    inherit tests;
+    inherit
+      installer
+      installerWithTarball
+      tests;
   };
 
 in jobs
