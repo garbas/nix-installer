@@ -1,11 +1,27 @@
 [package]
 name = "nix-installer"
 version = "0.1.0"
-authors = ["Maarten Hoogendoorn <maarten@moretea.nl>"]
+edition = "2021"
+rust-version = "1.56"
+description = "An installer framework for Nix"
+authors = [ "Rok Garbas <rok@garbas>",
+            "Maarten Hoogendoorn <maarten@moretea.nl>"
+          ]
+documentation = "https://github.com/garbas/nix-installer"
+readme = "README.md"
+homepage = "https://github.com/garbas/nix-installer"
+repository = "https://github.com/garbas/nix-installer"
+license = "MIT"
+keywords = [ "nix", "installer" ]
 
 [dependencies]
+anyhow = "*"
+clap = "*"
+clap-verbosity-flag = "*"
+simplelog = "*"
 elf = "*"
-bzip2 = "*"
+log = "*"
+structopt = "*"
 tar = "*"
 tempdir = "*"
-clap = "*"
+xz2 = "*"
