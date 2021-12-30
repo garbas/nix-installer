@@ -4,11 +4,21 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   inputs.nix.url = "github:NixOS/nix/2.5-maintenance";
   inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.fenix = {
+    url = "github:nix-community/fenix";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+  inputs.naersk = {
+    url = "github:nmattia/naersk";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs = { self
             , nixpkgs
             , nix 
             , flake-utils
+            , fenix
+            , naersk
             }:
   flake-utils.lib.eachDefaultSystem (system:
     let
@@ -17,13 +27,23 @@
 
       tarball = "${nix.hydraJobs.binaryTarball.${system}}/${nix.packages.${system}.nix.name}-${system}.tar.xz";
 
-      installer = pkgs.rustPlatform.buildRustPackage {
-        pname = cargo.package.name;
-        version = cargo.package.version;
+      target = "x86_64-unknown-linux-musl";
+      toolchain = with fenix.packages.${system};
+        combine [
+          minimal.rustc
+          minimal.cargo
+          targets.${target}.latest.rust-std
+        ];
+      rustPlatform = naersk.lib.${system}.override {
+        cargo = toolchain;
+        rustc = toolchain;
+      };
+
+      installer = rustPlatform.buildPackage {
         src = self;
-        cargoLock = {
-          lockFile = ./Cargo.lock;
-        };
+        CARGO_BUILD_TARGET = target;
+        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER =
+          "${pkgs.pkgsCross.aarch64-multiplatform.stdenv.cc}/bin/${target}-gcc";
       };
 
       installerWithTarball = pkgs.stdenv.mkDerivation {
