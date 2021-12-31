@@ -29,7 +29,7 @@ struct Opt {
 
 fn run() -> Result<()> {
     let options = Opt::from_args();
-  
+
     // Setup logging
     let _ = TermLogger::init(
       options.verbose.log_level().map_or(LevelFilter::Error, |l| l.to_level_filter()),
@@ -48,11 +48,7 @@ fn run() -> Result<()> {
     let temp_dir = extract_tarball(&options.tarball)
         .context("Could not extract the tarball")?;
 
-    pause();
-
     install_nix(temp_dir)?;
-
-    pause();
 
     Ok(())
 }
